@@ -1,8 +1,10 @@
 package com.sionic.ai.service
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
 @Component
+@ConditionalOnProperty(prefix = "app.openai", name = ["enabled"], havingValue = "false", matchIfMissing = true)
 class MockAiClient : AiClient {
     override fun generateAnswer(model: String, question: String, history: List<Pair<String, String>>): String {
         return "[mock:$model] $question"

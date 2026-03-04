@@ -18,6 +18,10 @@ server:
   port: 8080
 
 app:
+  openai:
+    enabled: ${OPENAI_ENABLED:false}
+    api-key: ${OPENAI_API_KEY:}
+    base-url: ${OPENAI_BASE_URL:https://api.openai.com}
   jwt:
     issuer: "ai-chatbot-service"
     secret: "change-this-in-prod-change-this-in-prod"
