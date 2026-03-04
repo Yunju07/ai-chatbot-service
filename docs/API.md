@@ -136,6 +136,27 @@
 - Response 200 (JSON)
   - `id`, `userId`, `chatId`, `isPositive`, `status`, `createdAt`
 
+## 분석 및 보고
+
+### 사용자 활동 집계 (관리자)
+- Method: `GET`
+- Path: `/reports/activity`
+- Auth: 필요
+- Response 200 (JSON)
+  - `from` (string, ISO-8601)
+  - `to` (string, ISO-8601)
+  - `signupCount` (number)
+  - `loginCount` (number)
+  - `chatCreatedCount` (number)
+
+### 대화 보고서 CSV (관리자)
+- Method: `GET`
+- Path: `/reports/chats.csv`
+- Auth: 필요
+- Response: `text/plain` (CSV 파일)
+- 헤더: `Content-Disposition: attachment; filename=chat_report.csv`
+- 컬럼: `chat_id,user_id,user_email,question,answer,created_at`
+
 ## 에러 응답
 - Response (JSON)
   - `message` (string)
