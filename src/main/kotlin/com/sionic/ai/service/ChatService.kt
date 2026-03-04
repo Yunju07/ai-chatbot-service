@@ -35,7 +35,7 @@ class ChatService(
     fun createChat(principal: UserPrincipal, request: ChatCreateRequest): ChatCreateResponse {
         val thread = resolveThread(principal.id)
         val model = request.model ?: chatProperties.defaultModel
-        val history = chatRepository.findByThreadIdInOrderByCreatedAtAsc(listOf(thread.id))
+        val history = chatRepository.findByThreadIdInAndDeletedAtIsNullOrderByCreatedAtAsc(listOf(thread.id))
             .map { it.question to it.answer }
 
         val answer = aiClient.generateAnswer(model, request.question, history)
@@ -59,7 +59,7 @@ class ChatService(
     fun streamChat(principal: UserPrincipal, request: ChatCreateRequest, emitter: SseEmitter) {
         val thread = resolveThread(principal.id)
         val model = request.model ?: chatProperties.defaultModel
-        val history = chatRepository.findByThreadIdInOrderByCreatedAtAsc(listOf(thread.id))
+        val history = chatRepository.findByThreadIdInAndDeletedAtIsNullOrderByCreatedAtAsc(listOf(thread.id))
             .map { it.question to it.answer }
 
         Thread {
@@ -105,13 +105,13 @@ class ChatService(
         val sortDir = if (sort.equals("asc", ignoreCase = true)) Sort.Direction.ASC else Sort.Direction.DESC
         val pageable = PageRequest.of(page, size, Sort.by(sortDir, "createdAt"))
         val threadsPage = if (principal.role == Role.ADMIN) {
-            threadRepository.findAll(pageable)
+            threadRepository.findByDeletedAtIsNull(pageable)
         } else {
-            threadRepository.findByUserId(principal.id, pageable)
+            threadRepository.findByUserIdAndDeletedAtIsNull(principal.id, pageable)
         }
 
         val threadIds = threadsPage.content.map { it.id }
-        val chats = if (threadIds.isEmpty()) emptyList() else chatRepository.findByThreadIdInOrderByCreatedAtAsc(threadIds)
+        val chats = if (threadIds.isEmpty()) emptyList() else chatRepository.findByThreadIdInAndDeletedAtIsNullOrderByCreatedAtAsc(threadIds)
         val chatsByThread = chats.groupBy { it.threadId }
 
         val threadItems = threadsPage.content.map { thread ->
@@ -145,16 +145,18 @@ class ChatService(
         if (principal.role != Role.ADMIN && thread.userId != principal.id) {
             throw UnauthorizedException("Not allowed")
         }
-        chatRepository.deleteByThreadId(threadId)
-        threadRepository.delete(thread)
+        val now = OffsetDateTime.now()
+        thread.deletedAt = now
+        val chats = chatRepository.findByThreadId(threadId)
+        chats.forEach { it.deletedAt = now }
     }
 
     private fun resolveThread(userId: UUID): Thread {
-        val latestThread = threadRepository.findTopByUserIdOrderByCreatedAtDesc(userId)
+        val latestThread = threadRepository.findTopByUserIdAndDeletedAtIsNullOrderByCreatedAtDesc(userId)
         if (latestThread == null) {
             return threadRepository.save(Thread(userId = userId))
         }
-        val lastChat = chatRepository.findTopByUserIdOrderByCreatedAtDesc(userId)
+        val lastChat = chatRepository.findTopByUserIdAndDeletedAtIsNullOrderByCreatedAtDesc(userId)
         if (lastChat == null) {
             return threadRepository.save(Thread(userId = userId))
         }

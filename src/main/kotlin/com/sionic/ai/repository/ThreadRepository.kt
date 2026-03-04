@@ -7,7 +7,9 @@ import org.springframework.data.domain.Pageable
 import java.util.UUID
 
 interface ThreadRepository : JpaRepository<Thread, UUID> {
-    fun findTopByUserIdOrderByCreatedAtDesc(userId: UUID): Thread?
+    fun findTopByUserIdAndDeletedAtIsNullOrderByCreatedAtDesc(userId: UUID): Thread?
 
-    fun findByUserId(userId: UUID, pageable: Pageable): Page<Thread>
+    fun findByUserIdAndDeletedAtIsNull(userId: UUID, pageable: Pageable): Page<Thread>
+
+    fun findByDeletedAtIsNull(pageable: Pageable): Page<Thread>
 }

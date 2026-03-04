@@ -19,6 +19,9 @@ class Thread(
 
     @Column(nullable = false)
     var createdAt: OffsetDateTime? = null,
+
+    @Column
+    var deletedAt: OffsetDateTime? = null,
 ) {
     @PrePersist
     fun prePersist() {
