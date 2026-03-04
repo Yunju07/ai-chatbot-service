@@ -89,6 +89,53 @@
 - Auth: 필요
 - Response 200 (no body)
 
+## 피드백
+
+### 피드백 생성
+- Method: `POST`
+- Path: `/feedbacks`
+- Auth: 필요
+- Request (JSON)
+  - `chatId` (string, required)
+  - `isPositive` (boolean, required)
+- Response 200 (JSON)
+  - `id` (string)
+  - `userId` (string)
+  - `chatId` (string)
+  - `isPositive` (boolean)
+  - `status` (string, `PENDING|RESOLVED`)
+  - `createdAt` (string, ISO-8601)
+
+### 피드백 목록 조회
+- Method: `GET`
+- Path: `/feedbacks`
+- Auth: 필요
+- Query
+  - `page` (number, default: 0)
+  - `size` (number, default: 20)
+  - `sort` (string, `asc|desc`, default: `desc`)
+  - `isPositive` (boolean, optional)
+- Response 200 (JSON)
+  - `items` (array)
+    - `id` (string)
+    - `userId` (string)
+    - `chatId` (string)
+    - `isPositive` (boolean)
+    - `status` (string)
+    - `createdAt` (string)
+  - `page` (number)
+  - `size` (number)
+  - `totalItems` (number)
+
+### 피드백 상태 변경 (관리자)
+- Method: `PUT`
+- Path: `/feedbacks/{feedbackId}/status`
+- Auth: 필요
+- Request (JSON)
+  - `status` (string, `PENDING|RESOLVED`)
+- Response 200 (JSON)
+  - `id`, `userId`, `chatId`, `isPositive`, `status`, `createdAt`
+
 ## 에러 응답
 - Response (JSON)
   - `message` (string)
