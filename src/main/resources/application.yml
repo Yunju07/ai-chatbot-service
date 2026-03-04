@@ -2,10 +2,10 @@ spring:
   application:
     name: ai-chatbot-service
   datasource:
-    url: jdbc:h2:mem:ai_chatbot;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ""
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/ai_chatbot}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME:${USER}}
+    password: ${DB_PASSWORD:}
   jpa:
     hibernate:
       ddl-auto: update
@@ -13,12 +13,15 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
-  h2:
-    console:
-      enabled: true
 
 server:
   port: 8080
+
+app:
+  jwt:
+    issuer: "ai-chatbot-service"
+    secret: "change-this-in-prod-change-this-in-prod"
+    expiration-minutes: 120
 
 logging:
   level:
