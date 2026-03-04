@@ -1,0 +1,23 @@
+# Gradle
+.gradle/
+**/build/
+
+# IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# H2 (file-based, if used later)
+*.mv.db
+*.trace.db
+
+# Env
+.env
