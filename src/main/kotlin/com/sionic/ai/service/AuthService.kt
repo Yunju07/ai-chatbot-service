@@ -6,6 +6,7 @@ import com.sionic.ai.dto.AuthResponse
 import com.sionic.ai.dto.LoginRequest
 import com.sionic.ai.dto.SignupRequest
 import com.sionic.ai.repository.UserRepository
+import com.sionic.ai.domain.ActivityType
 import com.sionic.ai.security.JwtProperties
 import com.sionic.ai.security.JwtProvider
 import com.sionic.ai.util.BadRequestException
@@ -20,6 +21,7 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtProvider: JwtProvider,
     private val jwtProperties: JwtProperties,
+    private val activityLogService: ActivityLogService,
 ) {
     @Transactional
     fun signup(request: SignupRequest): AuthResponse {
@@ -33,6 +35,7 @@ class AuthService(
             role = Role.MEMBER,
         )
         val saved = userRepository.save(user)
+        activityLogService.record(saved.id, ActivityType.SIGNUP)
         val token = jwtProvider.generate(saved.id, saved.email, saved.role)
         return AuthResponse(token = token, expiresInMinutes = jwtProperties.expirationMinutes)
     }
@@ -44,6 +47,7 @@ class AuthService(
         if (!passwordEncoder.matches(request.password, user.passwordHash)) {
             throw UnauthorizedException("Invalid credentials")
         }
+        activityLogService.record(user.id, ActivityType.LOGIN)
         val token = jwtProvider.generate(user.id, user.email, user.role)
         return AuthResponse(token = token, expiresInMinutes = jwtProperties.expirationMinutes)
     }

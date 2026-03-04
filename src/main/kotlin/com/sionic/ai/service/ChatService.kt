@@ -1,6 +1,7 @@
 package com.sionic.ai.service
 
 import com.sionic.ai.config.ChatProperties
+import com.sionic.ai.domain.ActivityType
 import com.sionic.ai.domain.Chat
 import com.sionic.ai.domain.Role
 import com.sionic.ai.domain.Thread
@@ -28,6 +29,7 @@ class ChatService(
     private val threadRepository: ThreadRepository,
     private val chatProperties: ChatProperties,
     private val aiClient: AiClient,
+    private val activityLogService: ActivityLogService,
 ) {
     @Transactional
     fun createChat(principal: UserPrincipal, request: ChatCreateRequest): ChatCreateResponse {
@@ -44,6 +46,7 @@ class ChatService(
             answer = answer,
         )
         val saved = chatRepository.save(chat)
+        activityLogService.record(principal.id, ActivityType.CHAT_CREATED)
         return ChatCreateResponse(
             threadId = saved.threadId.toString(),
             chatId = saved.id.toString(),
@@ -73,6 +76,7 @@ class ChatService(
                     answer = answerBuilder.toString(),
                 )
                 val saved = chatRepository.save(chat)
+                activityLogService.record(principal.id, ActivityType.CHAT_CREATED)
                 emitter.send(
                     SseEmitter.event().name("done").data(
                         ChatCreateResponse(
