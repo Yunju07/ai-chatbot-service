@@ -41,7 +41,54 @@
 - Response 200 (JSON)
   - `status` (string, `ok`)
 
+## 대화
+
+### 대화 생성
+- Method: `POST`
+- Path: `/chats`
+- Auth: 필요
+- Request (JSON)
+  - `question` (string, required)
+  - `isStreaming` (boolean, optional, default: false)
+  - `model` (string, optional)
+- Response 200 (JSON)
+  - `threadId` (string)
+  - `chatId` (string)
+  - `question` (string)
+  - `answer` (string)
+  - `createdAt` (string, ISO-8601)
+- Streaming Response (SSE)
+  - Content-Type: `text/event-stream`
+  - `event: chunk` → `data: <string>`
+  - `event: done` → `data: {ChatCreateResponse}`
+
+### 대화 목록 조회 (스레드 그룹)
+- Method: `GET`
+- Path: `/chats`
+- Auth: 필요
+- Query
+  - `page` (number, default: 0)
+  - `size` (number, default: 20)
+  - `sort` (string, `asc|desc`, default: `desc`)
+- Response 200 (JSON)
+  - `items` (array)
+    - `id` (string, threadId)
+    - `createdAt` (string, ISO-8601)
+    - `chats` (array)
+      - `id` (string)
+      - `question` (string)
+      - `answer` (string)
+      - `createdAt` (string)
+  - `page` (number)
+  - `size` (number)
+  - `totalItems` (number)
+
+### 스레드 삭제
+- Method: `DELETE`
+- Path: `/chats/threads/{threadId}`
+- Auth: 필요
+- Response 200 (no body)
+
 ## 에러 응답
 - Response (JSON)
   - `message` (string)
-
