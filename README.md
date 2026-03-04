@@ -6,11 +6,11 @@
 - 현재 구현은 인증/JWT, 대화/스레드, 피드백, 관리자 리포트(CSV)까지 포함합니다.
 
 ## 기술 스택
-- Kotlin `1.9.x`
-- Spring Boot `3.x.x`
+- Kotlin `1.9.24`
+- Spring Boot `3.3.2`
 - Java `17`
 - Spring Data JPA, Spring Security, JWT
-- DB: PostgreSQL 
+- DB: PostgreSQL `15.15`
 
 ## 실행 방법
 
