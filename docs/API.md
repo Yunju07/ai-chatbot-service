@@ -4,6 +4,8 @@
 - Base URL: `http://localhost:8080`
 - 인증: `Authorization: Bearer <JWT>`
 - 응답 시간은 구현/환경에 따라 달라질 수 있습니다.
+- 에러 응답은 모든 케이스에서 아래 JSON 형식을 사용합니다.
+  - `{ "message": "..." }`
 
 ## 인증
 
@@ -69,7 +71,7 @@
 - Query
   - `page` (number, default: 0)
   - `size` (number, default: 20)
-  - `sort` (string, `asc|desc`, default: `desc`)
+  - `sort` (string, `asc|desc`, default: `desc`, 그 외 값은 400)
 - Response 200 (JSON)
   - `items` (array)
     - `id` (string, threadId)
@@ -113,7 +115,7 @@
 - Query
   - `page` (number, default: 0)
   - `size` (number, default: 20)
-  - `sort` (string, `asc|desc`, default: `desc`)
+  - `sort` (string, `asc|desc`, default: `desc`, 그 외 값은 400)
   - `isPositive` (boolean, optional)
 - Response 200 (JSON)
   - `items` (array)
@@ -160,3 +162,15 @@
 ## 에러 응답
 - Response (JSON)
   - `message` (string)
+
+## 관리자 계정 부트스트랩
+- 회원가입 API(`/auth/signup`)는 기본적으로 `MEMBER` 권한으로 생성됩니다.
+- 관리자 API 테스트를 위해 서버 시작 시 관리자 계정 부트스트랩을 사용할 수 있습니다.
+- 환경 변수
+  - `APP_BOOTSTRAP_ADMIN_ENABLED` (default: `false`)
+  - `APP_BOOTSTRAP_ADMIN_EMAIL` (enabled=true 일 때 필수)
+  - `APP_BOOTSTRAP_ADMIN_PASSWORD` (enabled=true 일 때 필수)
+  - `APP_BOOTSTRAP_ADMIN_NAME` (default: `Administrator`)
+- 동작
+  - 동일 이메일 사용자가 없으면 `ADMIN` 계정을 생성합니다.
+  - 동일 이메일 사용자가 있으면 해당 사용자를 `ADMIN`으로 승격합니다.

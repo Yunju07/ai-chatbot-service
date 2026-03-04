@@ -15,13 +15,13 @@ import com.sionic.ai.repository.ThreadRepository
 import com.sionic.ai.security.UserPrincipal
 import com.sionic.ai.util.BadRequestException
 import com.sionic.ai.util.UnauthorizedException
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import java.time.OffsetDateTime
 import java.util.UUID
-import org.springframework.data.domain.PageRequest
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 
 @Service
 class ChatService(
@@ -102,7 +102,7 @@ class ChatService(
         size: Int,
         sort: String,
     ): ThreadListResponse {
-        val sortDir = if (sort.equals("asc", ignoreCase = true)) Sort.Direction.ASC else Sort.Direction.DESC
+        val sortDir = parseSortDirection(sort)
         val pageable = PageRequest.of(page, size, Sort.by(sortDir, "createdAt"))
         val threadsPage = if (principal.role == Role.ADMIN) {
             threadRepository.findByDeletedAtIsNull(pageable)
@@ -165,6 +165,14 @@ class ChatService(
             threadRepository.save(Thread(userId = userId))
         } else {
             latestThread
+        }
+    }
+
+    private fun parseSortDirection(sort: String): Sort.Direction {
+        return when (sort.lowercase()) {
+            "asc" -> Sort.Direction.ASC
+            "desc" -> Sort.Direction.DESC
+            else -> throw BadRequestException("sort must be one of: asc, desc")
         }
     }
 }

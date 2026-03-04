@@ -53,7 +53,7 @@ class FeedbackService(
         sort: String,
         isPositive: Boolean?,
     ): FeedbackListResponse {
-        val sortDir = if (sort.equals("asc", ignoreCase = true)) Sort.Direction.ASC else Sort.Direction.DESC
+        val sortDir = parseSortDirection(sort)
         val pageable = PageRequest.of(page, size, Sort.by(sortDir, "createdAt"))
         val userId = if (principal.role == Role.ADMIN) null else principal.id
         val pageResult = feedbackRepository.findAllFiltered(userId, isPositive, pageable)
@@ -81,4 +81,12 @@ class FeedbackService(
             status = feedback.status,
             createdAt = feedback.createdAt!!.toString(),
         )
+
+    private fun parseSortDirection(sort: String): Sort.Direction {
+        return when (sort.lowercase()) {
+            "asc" -> Sort.Direction.ASC
+            "desc" -> Sort.Direction.DESC
+            else -> throw BadRequestException("sort must be one of: asc, desc")
+        }
+    }
 }

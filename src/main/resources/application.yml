@@ -25,6 +25,11 @@ app:
   chat:
     thread-expire-minutes: 30
     default-model: "gpt-4o-mini"
+  bootstrap-admin:
+    enabled: ${APP_BOOTSTRAP_ADMIN_ENABLED:false}
+    email: ${APP_BOOTSTRAP_ADMIN_EMAIL:}
+    password: ${APP_BOOTSTRAP_ADMIN_PASSWORD:}
+    name: ${APP_BOOTSTRAP_ADMIN_NAME:Administrator}
 
 logging:
   level:
