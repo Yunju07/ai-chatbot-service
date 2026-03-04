@@ -22,6 +22,9 @@ app:
     issuer: "ai-chatbot-service"
     secret: "change-this-in-prod-change-this-in-prod"
     expiration-minutes: 120
+  chat:
+    thread-expire-minutes: 30
+    default-model: "gpt-4o-mini"
 
 logging:
   level:
